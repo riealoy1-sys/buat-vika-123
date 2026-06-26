@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khusus Buat Vika</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #0b1528; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; text-align: center; }
+        
+        /* Tirai Depan */
+        .tirai { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, #1a2a4a, #0b1528); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; transition: transform 1.5s ease-in-out; }
+        .tirai.buka { transform: translateY(-100%); pointer-events: none; }
+        .btn-buka { padding: 15px 30px; background: #e2b659; border: none; border-radius: 25px; color: #0b1528; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 20px; box-shadow: 0 0 15px rgba(226,182,89,0.5); }
+        
+        /* Animasi Garis Hati Teks Berputar */
+        .container-animasi { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0b1528; display: flex; justify-content: center; align-items: center; z-index: 5; opacity: 0; pointer-events: none; transition: opacity 1s ease; }
+        .container-animasi.aktif { opacity: 1; pointer-events: auto; }
+        
+        .box-hati { position: relative; width: 340px; height: 340px; display: flex; justify-content: center; align-items: center; transform: scale(0); transition: transform 2.5s ease-in-out; }
+        .box-hati.show { transform: scale(1); }
+        
+        svg { width: 100%; height: 100%; animation: putarHati 25s linear infinite; }
+        textPath { font-size: 9.5px; fill: rgba(255, 255, 255, 0.85); font-weight: bold; letter-spacing: 2.5px; text-shadow: 0 0 8px rgba(255,255,255,0.6); }
+        
+        .nama-tengah { position: absolute; font-size: 36px; font-weight: 400; color: #ffffff; opacity: 0; transform: scale(0.5); transition: all 1.8s ease 1.5s; text-shadow: 0 0 10px rgba(255,255,255,0.5); font-family: 'Times New Roman', serif; font-style: italic; }
+        .nama-tengah.show { opacity: 1; transform: scale(1); }
+
+        /* Konten Utama */
+        .konten { padding: 20px; width: 100%; max-width: 400px; display: none; z-index: 2; }
+        .konten.muncul { display: block; animation: fadeIn 2s ease; }
+        .love-title { font-size: 12px; color: #ffffff; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; opacity: 0.6; }
+        .love-subtitle { font-size: 20px; font-weight: 600; color: #ffffff; margin-bottom: 15px; }
+        
+        /* Galeri Foto */
+        .slide-foto { width: 100%; height: 320px; border-radius: 10px; object-fit: cover; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid rgba(255, 255, 255, 0.2); }
+        
+        /* Teks Cerita */
+        .teks-cerita { font-size: 14px; line-height: 1.6; color: rgba(255,255,255,0.8); min-height: 80px; margin-bottom: 25px; padding: 0 10px; }
+        .btn-next { padding: 12px 35px; background: #ffffff; color: #0b1528; border: none; border-radius: 25px; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.3s; }
+        
+        /* Halaman Akhir Buket Bunga */
+        .halaman-bunga { display: none; padding: 20px; max-width: 400px; animation: fadeIn 2s ease; }
+        .img-bunga { width: 80%; max-width: 260px; margin-bottom: 20px; animation: melayang 3s ease-in-out infinite; }
+        .kartu-ucapan { background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+
+        @keyframes putarHati { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes melayang { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    </style>
+</head>
+<body>
+
+    <!-- KODE PEMUTAR MUSIK -->
+    <audio id="lagu" loop>
+        <source src="musik.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Halaman Tirai Depan -->
+    <div class="tirai" id="halamanTirai">
+        <p style="font-size: 35px; margin-bottom: 10px;">🥺</p>
+        <p style="font-size: 11px; letter-spacing: 3px; opacity: 0.6; text-transform: uppercase;">Pertunjukan Spesial</p>
+        <h1 style="color: #ffffff; font-size: 26px; font-weight: 400; margin: 5px 0 25px 0;">Khusus buat sayangku Vika</h1>
+        <button class="btn-buka" onclick="bukaTirai()">Buka tirai</button>
+        <p style="font-size: 11px; opacity: 0.4; margin-top: 15px;">tap tombol buat mulai cerita</p>
+    </div>
+
+    <!-- Halaman Animasi Hati Berputar -->
+    <div class="container-animasi" id="screenAnimasi" onclick="masukKeKonten()">
+        <div class="box-hati" id="wrapperHati">
+            <svg viewBox="0 0 100 100">
+                <defs>
+                    <path id="heartPath" d="M 50,30 A 13,13 0 0,1 76,43 C 76,58 50,80 50,80 C 50,80 24,58 24,43 A 13,13 0 0,1 50,30 Z" />
+                </defs>
+                <text>
+                    <textPath href="#heartPath" startOffset="0%">
+                        i love you i love you i love you i love you i love you i love you i love you i love you i love you i love you
+                    </textPath>
+                </text>
+            </svg>
+            <div class="nama-tengah" id="namaVika">Vika</div>
+        </div>
+    </div>
+
+    <!-- Konten Utama (Babak Cerita) -->
+    <div class="konten" id="kontenUtama">
+        <p class="love-title" id="babTitle">BABAK 1 / 4</p>
+        <h2 class="love-subtitle" id="subTitle">"rambut yang jatuhnya terlalu pas"</h2>
+        
+        <img src="foto1.jpg" class="slide-foto" id="fotoGanti">
+        
+        <p class="teks-cerita" id="teksGanti">sayang, rambut kamu di foto ini jatuhnya niat banget. diagonalnya pas, acaknya cantik, berantakannya malah estetik.</p>
+        
+        <button class="btn-next" onclick="nextBabak()" id="btnAksi">Lanjut cerita</button>
+    </div>
+
+    <!-- Halaman Akhir (Buket Bunga) -->
+    <div class="halaman-bunga" id="kontenBunga">
+        <img src="bunga.png" class="img-bunga" alt="Buket Bunga">
+        <div class="kartu-ucapan">
+            <p style="font-size: 11px; opacity: 0.6; letter-spacing: 2px;">APRESIASI</p>
+            <h2 style="font-size: 20px; margin: 5px 0 15px 0; font-family: 'Times New Roman', serif; font-style: italic;">Thank You For Staying untuk Vika</h2>
+            <p style="font-size: 13px; opacity: 0.8; line-height: 1.6; margin-bottom: 15px;">Terima kasih karena tetap ada.</p>
+            <p style="font-size: 11px; opacity: 0.5;">— Dari kamu, buat Vika</p>
+        </div>
+    </div>
+
+    <script>
+        let babakSaatIni = 1;
+        const lagu = document.getElementById('lagu');
+
+        // Database Konten Cerita yang Diperbaiki Jalurnya
+        const dataKonten = {
+            2: {
+                bab: "BABAK 2 / 4",
+                sub: "senyum kecil yang menang besar",
+                foto: "foto2.jpg",
+                teks: "senyum kamu kecil, tapi efeknya besar banget, sayang. nggak perlu banyak gaya, nggak perlu usaha keras, tapi tetep bikin aku kalah. kayak lampu kamar boleh redup, tapi wajah kamu tetep punya glow sendiri.",
+                btn: "Lanjut cerita"
+            },
+            3: {
+                bab: "BABAK 3 / 4",
+                sub: "meteor pun kalah terang",
+                foto: "foto3.jpg",
+                teks: "andai batu meteor mendekati matahari buat adu terang, aku tetep pilih kamu pemenangnya, sayang. foto ini nggak cukup kalau cuma disimpan di galeri. kayaknya harus aku abadikan di figura, biar dunia tahu: rambut berantakan kamu pernah mengalahkan tata surya.",
+                btn: "Lanjut cerita"
+            },
+            4: {
+                bab: "BABAK 4 / 4",
+                sub: "Mwehehehe",
+                foto: "foto4.jpg",
+                teks: "sayang, mungkin buat kamu ini cuma foto biasa. tapi buat aku, ini momen yang terlalu manis buat lewat begitu aja. rambut kamu jatuhnya pas, senyum kamu hangatnya pas, dan semuanya terasa kayak foto yang memang semestinya diabadikan. jadi iya, kalau boleh aku simpan di figura. bukan karena fotonya dibuat sempurna, tapi karena kamu di foto ini cantiknya terlalu.",
+                btn: "Lihat bouquet"
+            }
+        };
+
+        function bukaTirai() {
+            // Putar lagu lebih awal agar memancing sistem audio browser
+            lagu.play().catch(e => console.log("Musik tertunda sistem browser."));
+            
+            document.getElementById('halamanTirai').classList.add('buka');
+            
+            setTimeout(() => {
+                document.getElementById('screenAnimasi').classList.add('aktif');
+                setTimeout(() => {
+                    document.getElementById('wrapperHati').classList.add('show');
+                    document.getElementById('namaVika').classList.add('show');
+                }, 100);
+            }, 1000);
+        }
+
+        function masukKeKonten() {
+            // Memastikan ulang musik berputar saat layar animasi diklik
+            lagu.play().catch(e => console.log("Musik diputar."));
+            document.getElementById('screenAnimasi').classList.remove('aktif');
+            document.getElementById('kontenUtama').classList.add('muncul');
+        }
+
+        function nextBabak() {
+            babakSaatIni++;
+            if (dataKonten[babakSaatIni]) {
+                document.getElementById('babTitle').innerText = dataKonten[babakSaatIni].bab;
+                document.getElementById('subTitle').innerText = `"${dataKonten[babakSaatIni].sub}"`;
+                document.getElementById('fotoGanti').src = dataKonten[babakSaatIni].foto;
+                document.getElementById('teksGanti').innerText = dataKonten[babakSaatIni].teks;
+                document.getElementById('btnAksi').innerText = dataKonten[babakSaatIni].btn;
+            } else {
+                // Selesai babak, tampilkan halaman buket bunga penutup
+                document.getElementById('kontenUtama').style.display = 'none';
+                document.getElementById('kontenBunga').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
